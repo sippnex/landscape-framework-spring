@@ -1,3 +1,4 @@
 rootProject.name = 'landscape-framework-spring'
 include 'landscape-core'
+include 'landscape-admin'
 
