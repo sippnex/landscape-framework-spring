@@ -1,10 +1,9 @@
 name: Gradle Publish CI
 
 on:
-  pull_request:
+  push:
     branches:
       - master
-  push:
     tags:
       - v*
 
