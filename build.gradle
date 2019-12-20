@@ -39,6 +39,12 @@ subprojects { subProject ->
     }
 
     signing {
+
+        def signingKey = findProperty('gpgPrivateKey1') ?: System.getenv('gpg_private_key')
+        def signingPassword = findProperty('gpgPassphrase1') ?: System.getenv('gpg_passphrase')
+
+        useInMemoryPgpKeys(signingKey, signingPassword)
+
         sign configurations.archives
     }
 
@@ -90,8 +96,8 @@ subprojects { subProject ->
                 def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
                 url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
                 credentials {
-                    username sonatypeUsername
-                    password sonatypePassword
+                    username findProperty('sonatypeUsername') ?: System.getenv('sonatype_username')
+                    password findProperty('sonatypePassword') ?: System.getenv('sonatype_password')
                 }
             }
         }
