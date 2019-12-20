@@ -21,7 +21,7 @@ jobs:
     - name: Test with Gradle
       run: ./gradlew test
     - name: Publish with Gradle
-      run: ./gradlew publish
+      run: ./gradlew publish -i
       env:
         gpg_private_key: ${{ secrets.gpg_private_key }}
         gpg_passphrase: ${{ secrets.gpg_passphrase }}
