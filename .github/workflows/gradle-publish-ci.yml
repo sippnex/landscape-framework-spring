@@ -3,7 +3,13 @@ name: Gradle Publish CI
 on:
   push:
     branches:
+      -master
+    tags:
+      - v*
+  pull_request:
+    branches:
       - master
+  create:
     tags:
       - v*
 
