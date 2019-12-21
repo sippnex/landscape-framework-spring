@@ -1,5 +1,7 @@
 plugins {
     id 'java'
+    id 'maven'
+    id 'signing'
 }
 
 group 'com.sippnex'
@@ -16,13 +18,13 @@ allprojects {
 subprojects { subProject ->
 
     apply plugin: 'java'
-    apply plugin: 'maven-publish'
+    apply plugin: 'maven'
     apply plugin: 'signing'
 
     group 'com.sippnex'
     version findProperty('projectVersion') ?: '0.0.1-SNAPSHOT'
 
-    task sourceJar(type: Jar) {
+    /*task sourceJar(type: Jar) {
         classifier "sources"
         from sourceSets.main.allJava
     }
@@ -30,12 +32,20 @@ subprojects { subProject ->
     task javadocJar(type: Jar, dependsOn: javadoc) {
         classifier "javadoc"
         from javadoc.destinationDir
+    }*/
+
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    task javadocJar(type: Jar) {
+        classifier = 'javadoc'
+        from javadoc
     }
 
     artifacts {
-        archives jar
-        archives sourceJar
-        archives javadocJar
+        archives javadocJar, sourcesJar
     }
 
     signing {
@@ -43,120 +53,66 @@ subprojects { subProject ->
         def signingKey = findProperty('gpgPrivateKey') ?: System.getenv('gpg_private_key')
         def signingPassword = findProperty('gpgPassphrase') ?: System.getenv('gpg_passphrase')
 
-        useInMemoryPgpKeys(signingKey, signingPassword)
+        useInMemoryPgpKeys(signingKey as String, signingPassword as String)
 
         sign configurations.archives
     }
 
-    publishing {
-        publications {
-            mavenJava(MavenPublication) {
-                customizePom(pom)
-                groupId subProject.group
-                artifactId subProject.name
-                version subProject.version
-
-                from components.java
-
-                artifact(sourceJar) {
-                    classifier = 'sources'
-                }
-                artifact(javadocJar) {
-                    classifier = 'javadoc'
-                }
-
-                // create the sign pom artifact
-                pom.withXml {
-                    def pomFile = file("${project.buildDir}/generated-pom.xml")
-                    writeTo(pomFile)
-                    def pomAscFile = signing.sign(pomFile).signatureFiles[0]
-                    artifact(pomAscFile) {
-                        classifier = null
-                        extension = 'pom.asc'
-                    }
-                }
-
-                // create the signed artifacts
-                project.tasks.signArchives.signatureFiles.each {
-                    artifact(it) {
-                        def matcher = it.file =~ /-(sources|javadoc)\.jar\.asc$/
-                        if (matcher.find()) {
-                            classifier = matcher.group(1)
-                        } else {
-                            classifier = null
-                        }
-                        extension = 'jar.asc'
-                    }
-                }
-            }
-        }
+    uploadArchives {
         repositories {
-            maven {
-                def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-                def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
-                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-                credentials {
-                    username findProperty('sonatypeUsername') ?: System.getenv('sonatype_username')
-                    password findProperty('sonatypePassword') ?: System.getenv('sonatype_password')
+            mavenDeployer {
+
+                def username = findProperty('sonatypeUsername') ?: System.getenv('sonatype_username')
+                def password = findProperty('sonatypePassword') ?: System.getenv('sonatype_password')
+
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                    authentication(userName: username, password: password)
                 }
-            }
-        }
-    }
 
-    model {
-        tasks.generatePomFileForMavenJavaPublication {
-            destination = file("$buildDir/generated-pom.xml")
-        }
-        tasks.publishMavenJavaPublicationToMavenLocal {
-            dependsOn project.tasks.signArchives
-        }
-        tasks.publishMavenJavaPublicationToMavenRepository {
-            dependsOn project.tasks.signArchives
-        }
-    }
-
-}
-
-def customizePom(pom) {
-    pom.withXml {
-        def root = asNode()
-
-        // eliminate test-scoped dependencies (no need in maven central POMs)
-        root.dependencies.removeAll { dep ->
-            dep.scope == "test"
-        }
-
-        // add all items necessary for maven central publication
-        root.children().last() + {
-            resolveStrategy = DELEGATE_FIRST
-
-            description 'Landscape Framework for Spring'
-            name 'Landscape Framework Spring'
-            url 'https://github.com/sippnex/landscape-framework-spring'
-            organization {
-                name 'Sippnex'
-                url 'https://www.sippnex.com/'
-            }
-            issueManagement {
-                system 'GitHub'
-                url 'https://github.com/sippnex/landscape-framework-spring/issues'
-            }
-            licenses {
-                license {
-                    name 'Apache License, Version 2.0'
-                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    distribution 'repo'
+                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                    authentication(userName: username, password: password)
                 }
-            }
-            scm {
-                url 'https://github.com/sippnex/landscape-framework-spring'
-                connection 'scm:git:git://github.com/sippnex/landscape-framework-spring.git'
-                developerConnection 'scm:git:ssh://git@github.com:sippnex/landscape-framework-spring.git'
-            }
-            developers {
-                developer {
-                    name 'sippnex'
-                    email 'julian.sobotka@gmail.com'
+
+                pom.project {
+                    name 'Landscape Framework Spring'
+                    description 'Landscape Framework for Spring'
+                    packaging 'jar'
+                    artifactId subProject.name
+                    version subProject.version
+                    url 'https://github.com/sippnex/landscape-framework-spring'
+
+                    organization {
+                        name 'Sippnex'
+                        url 'https://www.sippnex.com/'
+                    }
+
+                    issueManagement {
+                        system 'GitHub'
+                        url 'https://github.com/sippnex/landscape-framework-spring/issues'
+                    }
+
+                    licenses {
+                        license {
+                            name 'Apache License, Version 2.0'
+                            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                            distribution 'repo'
+                        }
+                    }
+
+                    scm {
+                        url 'https://github.com/sippnex/landscape-framework-spring'
+                        connection 'scm:git:git://github.com/sippnex/landscape-framework-spring.git'
+                        developerConnection 'scm:git:ssh://git@github.com:sippnex/landscape-framework-spring.git'
+                    }
+
+                    developers {
+                        developer {
+                            name 'sippnex'
+                            email 'julian.sobotka@gmail.com'
+                        }
+                    }
                 }
             }
         }
