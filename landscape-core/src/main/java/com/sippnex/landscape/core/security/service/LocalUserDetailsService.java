@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-@Service(value="localUserDetailsService")
+@Service
 public class LocalUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;

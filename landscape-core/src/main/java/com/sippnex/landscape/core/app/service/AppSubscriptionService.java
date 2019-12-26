@@ -25,11 +25,11 @@ public class AppSubscriptionService {
         return appSubscriptionRepository.findByAppIdAndUserId(appId, userId);
     }
 
-    public void saveAppSubscription(AppSubscription appSubscription) {
-        appSubscriptionRepository.save(appSubscription);
+    public AppSubscription save(AppSubscription appSubscription) {
+        return appSubscriptionRepository.save(appSubscription);
     }
 
-    public void deleteAppSubscription(String appId, String userId) {
+    public void delete(String appId, String userId) {
         appSubscriptionRepository.deleteByAppIdAndUserId(appId, userId);
     }
 

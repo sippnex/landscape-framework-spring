@@ -19,7 +19,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/admin/apps")
+@RequestMapping("/api/admin/apps")
 public class AppAdminController {
 
     private final AppRegistry appRegistry;
@@ -90,7 +90,7 @@ public class AppAdminController {
 
         App storedApp = appService.save(postedApp);
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(ucBuilder.path("/management/apps/{id}").buildAndExpand(storedApp.getId()).toUri());
+        headers.setLocation(ucBuilder.path("/api/admin/apps/{id}").buildAndExpand(storedApp.getId()).toUri());
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 

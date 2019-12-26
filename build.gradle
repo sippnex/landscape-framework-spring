@@ -1,17 +1,23 @@
-plugins {
-    id 'java'
-    id 'maven'
-    id 'signing'
-}
-
-group 'com.sippnex'
-version findProperty('projectVersion') ?: '0.0.1-SNAPSHOT'
-
-sourceCompatibility = 1.8
-
-allprojects {
+buildscript {
     repositories {
         mavenCentral()
+    }
+
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.2.2.RELEASE")
+    }
+}
+
+allprojects {
+
+    apply plugin: 'java'
+    apply plugin: 'maven'
+    apply plugin: 'signing'
+    apply plugin: 'io.spring.dependency-management'
+
+    repositories {
+        mavenCentral()
+        jcenter()
     }
 }
 
@@ -20,19 +26,23 @@ subprojects { subProject ->
     apply plugin: 'java'
     apply plugin: 'maven'
     apply plugin: 'signing'
+    apply plugin: 'eclipse'
+    apply plugin: 'idea'
+    apply plugin: 'java'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'java-library'
+
+    dependencyManagement {
+        imports {
+            mavenBom("org.springframework.boot:spring-boot-dependencies:2.2.2.RELEASE")
+        }
+    }
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
 
     group 'com.sippnex'
     version findProperty('projectVersion') ?: '0.0.1-SNAPSHOT'
-
-    /*task sourceJar(type: Jar) {
-        classifier "sources"
-        from sourceSets.main.allJava
-    }
-
-    task javadocJar(type: Jar, dependsOn: javadoc) {
-        classifier "javadoc"
-        from javadoc.destinationDir
-    }*/
 
     task sourcesJar(type: Jar) {
         classifier = 'sources'
