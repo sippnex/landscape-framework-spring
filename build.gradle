@@ -8,6 +8,13 @@ buildscript {
     }
 }
 
+apply plugin: 'java'
+
+dependencies {
+    compile project(':landscape-core')
+    compile project(':landscape-admin')
+}
+
 allprojects {
 
     apply plugin: 'java'
