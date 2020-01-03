@@ -18,19 +18,19 @@ public class AppService {
         this.appRepository = appRepository;
     }
 
-    public Page<? extends App> getAllApps(Pageable pageable) {
+    public Page<App> getAllApps(Pageable pageable) {
         return appRepository.findAll(pageable);
     }
 
-    public List<? extends App> getAllApps() {
+    public List<App> getAllApps() {
         return appRepository.findAll();
     }
 
-    public Optional<? extends App> getAppById(String id) {
+    public Optional<App> getAppById(String id) {
         return appRepository.findById(id);
     }
 
-    public Optional<? extends App> getAppByName(String name) {
+    public Optional<App> getAppByName(String name) {
         return appRepository.findByName(name);
     }
 

@@ -3,7 +3,7 @@ package com.sippnex.landscape;
 import com.sippnex.landscape.core.app.domain.App;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document
+@Document(collection = "app")
 public class SampleApp extends App {
 
     public SampleApp() {
