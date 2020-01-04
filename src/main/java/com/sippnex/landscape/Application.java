@@ -10,8 +10,6 @@ import com.sippnex.landscape.core.security.repository.RoleRepository;
 import com.sippnex.landscape.core.security.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
-import org.springframework.data.mongodb.core.index.IndexOperations;
-import org.springframework.data.mongodb.core.index.IndexResolver;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @LandscapeApplication
