@@ -35,12 +35,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.headers().frameOptions().disable();
         http.headers().contentTypeOptions().disable();
         http.cors().and().csrf().disable();
-        http.authorizeRequests()
-                .antMatchers("/api/core/**", "/fileblade/download/**")
+        http
+                .authorizeRequests().antMatchers("/fileblade/download/**" )
+                .permitAll() // test
+                .and()
+                .authorizeRequests().antMatchers("/api/core/**")
                 .authenticated()
                 .and()
-                .authorizeRequests()
-                .antMatchers("/api/admin/**", "/fileblade/browse/**", "/fileblade/upload/**" )
+                .authorizeRequests().antMatchers("/api/admin/**", "/fileblade/browse/**", "/fileblade/upload/**" )
                 .hasRole("ADMIN")
                 .and()
                 .formLogin()
