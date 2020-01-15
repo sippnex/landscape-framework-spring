@@ -94,6 +94,33 @@ public class AppAdminController {
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
+    @RequestMapping(value = "", method = RequestMethod.PUT)
+    public ResponseEntity<Void> updateApp(@RequestBody FiremawDto firemawDto, UriComponentsBuilder ucBuilder) {
+
+        App postedApp = convertToApp(firemawDto);
+        if (postedApp == null) {
+            System.out.println("App Update failed: App Parsing error!");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        Optional<? extends App> optionalApp = appService.getAppById(postedApp.getId());
+        if (!optionalApp.isPresent()) {
+            System.out.println("App Update failed: App does not exist!");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        // update app
+        App storedApp = optionalApp.get();
+        storedApp.update(postedApp);
+
+        // TODO: check name conflict
+
+        storedApp = appService.save(storedApp);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(ucBuilder.path("/api/admin/apps/{id}").buildAndExpand(storedApp.getId()).toUri());
+        return new ResponseEntity<>(headers, HttpStatus.CREATED);
+    }
+
     private App convertToApp(FiremawDto firemawDto) {
         String className = (String) firemawDto.getPropertyValue("type");
         if (className.length() == 0) {

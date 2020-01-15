@@ -68,4 +68,9 @@ public abstract class App {
         this.icon = icon;
     }
 
+    public void update(App app) {
+        this.name = app.name;
+        this.icon = app.icon;
+    }
+
 }

@@ -28,4 +28,13 @@ public class SampleApp extends App {
     public void setContent(String content) {
         this.content = content;
     }
+
+    @Override
+    public void update(App app) {
+        super.update(app);
+        if(!(app instanceof SampleApp)) {
+            return;
+        }
+        this.content =  ((SampleApp) app).content;
+    }
 }
