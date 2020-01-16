@@ -11,4 +11,6 @@ public interface AppRepository extends MongoRepository<App, String> {
 
     Optional<App> findByName(String name);
 
+    Optional<App> findByNameAndIdNot(String name, String id);
+
 }

@@ -82,6 +82,7 @@ public class AppAdminController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
+        // check name conflict
         Optional<? extends App> optionalApp = appService.getAppByName(postedApp.getName());
         if (optionalApp.isPresent()) {
             System.out.println("App Creation failed: App with same Name already exists!");
@@ -113,7 +114,10 @@ public class AppAdminController {
         App storedApp = optionalApp.get();
         storedApp.update(postedApp);
 
-        // TODO: check name conflict
+        // check name conflict
+        if (appService.getAppByNameAndIdNot(storedApp.getId(), storedApp.getName()).isPresent()) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
 
         storedApp = appService.save(storedApp);
         HttpHeaders headers = new HttpHeaders();

@@ -34,6 +34,10 @@ public class AppService {
         return appRepository.findByName(name);
     }
 
+    public Optional<App> getAppByNameAndIdNot(String name, String id) {
+        return appRepository.findByNameAndIdNot(name, id);
+    }
+
     public App save(App app) {
         return appRepository.save(app);
     }
