@@ -10,9 +10,12 @@ import com.sippnex.landscape.core.security.repository.RoleRepository;
 import com.sippnex.landscape.core.security.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @LandscapeApplication
+@EnableMongoRepositories({"com.sippnex.landscape.addressbook"})
 public class Application  implements CommandLineRunner {
 
     private final RoleRepository roleRepository;
